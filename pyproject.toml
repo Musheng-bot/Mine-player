@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mine-env"
+version = "0.1.0"
+description = "Cross-platform screen streaming with latency measurement"
+requires-python = ">=3.10"
+dependencies = [
+    "opencv-python>=4.8",
+    "mss>=9.0",
+    "numpy>=1.24",
+    "PyGetWindow>=0.0.9",
+]
+
+[project.scripts]
+mine-env-sender = "mine_env.sender:main"
+mine-env-receiver = "mine_env.receiver:main"
+
+[tool.setuptools.packages.find]
+include = ["mine_env*"]
