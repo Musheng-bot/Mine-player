@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "mine-env"
 version = "0.1.0"
 description = "Cross-platform screen streaming with latency measurement"
-requires-python = ">=3.10"
+requires-python = ">=3.12,<3.13"
 dependencies = [
     "opencv-python>=4.8",
     "mss>=9.0",
