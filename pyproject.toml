@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mine-env"
+name = "mine-player"
 version = "0.1.0"
 description = "Cross-platform screen streaming with latency measurement"
 requires-python = ">=3.12,<3.13"
