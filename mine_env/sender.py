@@ -16,23 +16,29 @@ from .protocol import send_frame
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="把屏幕区域或窗口画面发送到接收端")
-    parser.add_argument("--config", default="config/env.yaml", help="网络 YAML 配置路径（默认：config/env.yaml）；命令行参数优先")
-    parser.add_argument("--host", default="127.0.0.1", help="接收端 IP")
-    parser.add_argument("--port", type=int, default=5000)
-    source = parser.add_mutually_exclusive_group(required=True)
-    source.add_argument("--region", type=parse_region, help="区域：left,top,width,height")
-    source.add_argument("--window", help="窗口标题关键字")
-    parser.add_argument("--fps", type=float, default=15, help="发送帧率")
-    parser.add_argument("--quality", type=int, default=80, help="JPEG 质量 1-100")
-    parser.add_argument("--refresh-window", type=float, default=1.0, help="窗口重新定位间隔（秒）")
+    parser.add_argument("--config", default="config/env.yaml", help="YAML 配置路径")
     return parser
 
 
 def run(args: argparse.Namespace) -> None:
-    if not 1 <= args.quality <= 100 or args.fps <= 0:
-        raise ValueError("--quality 必须在 1-100 之间，--fps 必须大于 0")
+    if type(args.quality) is not int or not 1 <= args.quality <= 100:
+        raise ValueError("quality 必须是 1-100 的整数")
+    if (
+        not isinstance(args.fps, (int, float)) or isinstance(args.fps, bool)
+        or args.fps <= 0
+        or not isinstance(args.refresh_window, (int, float))
+        or isinstance(args.refresh_window, bool)
+        or args.refresh_window <= 0
+    ):
+        raise ValueError("fps 和 refresh_window 必须是大于 0 的数字")
+    if args.window is not None and not isinstance(args.window, str):
+        raise ValueError("window 必须是字符串或 null")
+    if args.region is not None and not isinstance(args.region, str):
+        raise ValueError("region 必须是 left,top,width,height 格式的字符串或 null")
+    if bool(args.window) == bool(args.region):
+        raise ValueError("sender 必须且只能配置 window 或 region 之一")
 
-    region: CaptureRegion | None = args.region
+    region: CaptureRegion | None = parse_region(args.region) if args.region else None
     next_window_refresh = 0.0
     interval = 1.0 / args.fps
     encode_params = [int(cv2.IMWRITE_JPEG_QUALITY), args.quality]
@@ -68,10 +74,18 @@ def run(args: argparse.Namespace) -> None:
 
 
 def main() -> None:
-    args = parse_network_args(build_parser(), "sender")
+    args = parse_network_args(build_parser(), "sender", {
+        "host": "127.0.0.1",
+        "port": 5000,
+        "window": None,
+        "region": None,
+        "fps": 15,
+        "quality": 80,
+        "refresh_window": 1.0,
+    })
     try:
         run(args)
-    except (RuntimeError, ValueError) as exc:
+    except (argparse.ArgumentTypeError, RuntimeError, ValueError) as exc:
         raise SystemExit(str(exc)) from exc
 
 

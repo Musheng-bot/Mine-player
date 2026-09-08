@@ -15,14 +15,13 @@ from .protocol import receive_frame
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="接收并显示发送端画面")
-    parser.add_argument("--config", default="config/env.yaml", help="网络 YAML 配置路径（默认：config/env.yaml）；命令行参数优先")
-    parser.add_argument("--host", default="0.0.0.0", help="监听地址")
-    parser.add_argument("--port", type=int, default=5000)
-    parser.add_argument("--save", help="保存接收到的最新画面到 JPEG 文件")
+    parser.add_argument("--config", default="config/env.yaml", help="YAML 配置路径")
     return parser
 
 
 def run(args: argparse.Namespace) -> None:
+    if args.save is not None and not isinstance(args.save, str):
+        raise ValueError("save 必须是文件路径字符串或 null")
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
         server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         server.bind((args.host, args.port))
@@ -65,9 +64,15 @@ def run(args: argparse.Namespace) -> None:
 
 def main() -> None:
     try:
-        run(parse_network_args(build_parser(), "receiver"))
+        run(parse_network_args(build_parser(), "receiver", {
+            "host": "0.0.0.0",
+            "port": 5000,
+            "save": None,
+        }))
     except KeyboardInterrupt:
         print("\n接收已停止。")
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
 
 
 if __name__ == "__main__":
