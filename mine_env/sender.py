@@ -10,11 +10,13 @@ import cv2
 import numpy as np
 
 from .capture import CaptureRegion, create_screen, find_window_region, parse_region
+from .config import parse_network_args
 from .protocol import send_frame
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="把屏幕区域或窗口画面发送到接收端")
+    parser.add_argument("--config", default="config/env.yaml", help="网络 YAML 配置路径（默认：config/env.yaml）；命令行参数优先")
     parser.add_argument("--host", default="127.0.0.1", help="接收端 IP")
     parser.add_argument("--port", type=int, default=5000)
     source = parser.add_mutually_exclusive_group(required=True)
@@ -66,7 +68,7 @@ def run(args: argparse.Namespace) -> None:
 
 
 def main() -> None:
-    args = build_parser().parse_args()
+    args = parse_network_args(build_parser(), "sender")
     try:
         run(args)
     except (RuntimeError, ValueError) as exc:

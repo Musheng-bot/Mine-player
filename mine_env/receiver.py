@@ -9,11 +9,13 @@ import time
 import cv2
 import numpy as np
 
+from .config import parse_network_args
 from .protocol import receive_frame
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="接收并显示发送端画面")
+    parser.add_argument("--config", default="config/env.yaml", help="网络 YAML 配置路径（默认：config/env.yaml）；命令行参数优先")
     parser.add_argument("--host", default="0.0.0.0", help="监听地址")
     parser.add_argument("--port", type=int, default=5000)
     parser.add_argument("--save", help="保存接收到的最新画面到 JPEG 文件")
@@ -63,7 +65,7 @@ def run(args: argparse.Namespace) -> None:
 
 def main() -> None:
     try:
-        run(build_parser().parse_args())
+        run(parse_network_args(build_parser(), "receiver"))
     except KeyboardInterrupt:
         print("\n接收已停止。")
 

@@ -2,3 +2,5 @@
 .vscode/
 .mypy_cache/
 linear.md
+*.egg-info
+__pycache__/
