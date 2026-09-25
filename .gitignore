@@ -1,7 +1,9 @@
 .venv/
+.conda/
 .vscode/
 .mypy_cache/
 .idea/
 linear.md
 *.egg-info
 __pycache__/
+py_log.csv

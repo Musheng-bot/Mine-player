@@ -1,42 +1,33 @@
 # Mine-player
 
-## 项目环境
+本项目通过 CraftGround 在本机启动 Minecraft，直接获取画面和玩家状态并发送动作，不再使用屏幕截图或网络转发。
 
-在项目根目录安装依赖：
-
-```bash
-uv sync
-```
-
-## `mine_env` 画面传输
-
-`mine_env` 通过 TCP 将一台机器捕获的画面发送到另一台机器。两台机器分别修改 `config/env.yaml` 中自己使用的部分：
-
-```yaml
-sender:
-  host: "192.168.1.20" # receiver 所在机器的 IP
-  port: 5000
-  window: "Minecraft"  # 不区分大小写的窗口标题关键字
-  region: null         # 或填写 "0,0,1920,1080"，与 window 二选一
-  fps: 15
-  quality: 80
-  refresh_window: 1.0
-receiver:
-  host: "0.0.0.0"     # 监听本机所有 IPv4 接口
-  port: 5000
-  save: null           # 可填写 JPEG 保存路径
-```
-
-先在接收机器启动：
+## 创建环境
 
 ```bash
-uv run mine-env-receiver
+conda env create -f environment.yml
+conda activate mine-player
 ```
 
-再在发送机器启动：
+## 运行
 
 ```bash
-uv run mine-env-sender
+python main.py
 ```
 
-两端端口必须一致，网络和防火墙需要允许连接。需要使用其他配置文件时，仅通过 `--config PATH` 指定。
+程序会显示 CraftGround 返回的 RGB 画面，并定期输出坐标、视角、生命值、饥饿值和背包信息。画面窗口支持以下按键：
+
+- `W/A/S/D`：移动
+- `空格`：跳跃
+- `F`：攻击
+- `E`：使用物品
+- `I/J/K/L`：转动视角
+- `Esc`：退出
+
+只读取信息、不显示 OpenCV 窗口时运行：
+
+```bash
+python main.py --no-viewer
+```
+
+首次启动时 CraftGround 需要准备并启动 Minecraft，耗时会比之后启动更长。
