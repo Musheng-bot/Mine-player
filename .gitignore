@@ -9,5 +9,7 @@ __pycache__/
 py_log.csv
 *probe
 *layout
-_*
 /node_modules/
+
+# 仅供 AI agent 使用的本地笔记，不入库
+.agents/
