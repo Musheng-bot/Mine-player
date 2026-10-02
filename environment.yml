@@ -1,18 +1,51 @@
-name: mine-player
+# Mine-player —— 环境定格（2026-10-02 实测可用）
+#
+#   conda env create -f environment.yml
+#   conda activate mcio
+#
+# 技术路线：客户端 Mod（MCio）+ ZeroMQ 消息通信。
+# 不需要编译任何 C++，不需要 MSVC / CMake / Gradle。
+#
+# ⚠️ 最关键的一条：cbor2 必须锁在 5.x。
+#    cbor2 6.x 改了 object_hook 的调用约定（5.x 传 (decoder, map)，6.x 只传一个值），
+#    而 mcio_ctrl/cbor.py:47 假设收到 dict，于是每个观测包都解码失败：
+#        CBORDecodeError: error decoding map
+#        AttributeError: 'bool' object has no attribute 'pop'
+#    mcio_ctrl 的依赖里只写了 `cbor2` 没有上限，所以裸装会拿到 6.x 然后坏掉。
+name: mcio
 
 channels:
   - conda-forge
 
 dependencies:
-  - python=3.11
+  - python=3.12.15
   - pip
-  - openjdk=21
-  - cmake
-  - glew
-  - libpng
-  - libzlib
-  - libopengl
-  - libflite
-  - opencv
   - pip:
-      - craftground==2.7.4
+      # ---- 核心 ----
+      - mcio-ctrl==1.5.2          # MCio 的 Python 控制层 + Gymnasium 环境
+      - cbor2==5.9.0              # ⚠️ 必须是 5.x，见上
+      - pyzmq==27.2.0             # 与 MCio mod 通信
+      - gymnasium==1.3.0
+      - numpy==2.5.3
+      # ---- 画面 ----
+      - pillow==12.3.0            # 存帧为 PNG
+      - glfw==2.10.2              # render_mode="human" 的观测窗口
+      - PyOpenGL==3.1.10
+      # ---- mcio_ctrl 的其余直接依赖 ----
+      - dacite==1.9.2
+      - minecraft-launcher-lib==8.0
+      - NBT==1.5.1
+      - ruamel.yaml==0.19.1
+      - requests==2.34.2
+      - tqdm==4.70.1
+      - imageio==2.38.0
+      - imageio-ffmpeg==0.6.0
+      - typing_extensions==4.16.0
+      # ---- 传递依赖（一并锁住，保证可复现）----
+      - certifi==2026.7.22
+      - charset-normalizer==3.5.2
+      - cloudpickle==3.1.2
+      - colorama==0.4.6
+      - Farama-Notifications==0.0.6
+      - idna==3.20
+      - urllib3==2.8.0

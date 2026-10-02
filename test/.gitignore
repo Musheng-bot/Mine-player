@@ -1,0 +1,8 @@
+# 这些测试脚本会在运行目录留下产物，不入库
+*.png
+*.bin
+frame_check.png
+mcio_pkt_*.bin
+shot_*.png
+observe_*.png
+walk_*.png

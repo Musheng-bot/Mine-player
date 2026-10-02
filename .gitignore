@@ -7,3 +7,7 @@ linear.md
 *.egg-info
 __pycache__/
 py_log.csv
+*probe
+*layout
+_*
+/node_modules/
