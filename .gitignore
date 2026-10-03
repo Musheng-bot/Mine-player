@@ -11,5 +11,6 @@ py_log.csv
 *layout
 /node_modules/
 
-# 仅供 AI agent 使用的本地笔记，不入库
+# For agents
 .agents/
+AGENTS.md
